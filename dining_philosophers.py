@@ -361,7 +361,6 @@ def main():
             pass
         else:
             raise Exception("Number of philosophers must be between 2 and 10")
-    background_group_objects.append(None)
     meal_group, philosopher_group, table = load_position(5)
     while True:
         for event in pygame.event.get():
@@ -386,18 +385,32 @@ def main():
                     restart_game_button.restart_game()
                     number_lock = False
 
-        background_group.empty()
-        del background_group_objects[-1]
-        background_group_objects.append(table)
+        # DRAWING ORDER: Background, Table, Title, Meals, Philosophers, Buttons
+        # Background objects
+        background_group = pygame.sprite.Group()
         background_group.add(background_group_objects)
         background_group.draw(screen)
+
+        # Eating Table
+        table_group = pygame.sprite.Group()
+        table_group.add(table)
+        table_group.draw(screen)
+
+        # Game title
         screen.blit(title_text.text_surface, title_text.text_rect)
-        meal_group.empty()
+
+        # Meals of the philosophers
         meal_group.draw(screen)
+
+        # Philosophers
         philosopher_group.draw(screen)
 
+        # Game Control Buttons
         addition_group.draw(screen)
         game_state_group.draw(screen)
+
+
+        # Game Clock
         pygame.display.update()
         clock.tick(60)
 
