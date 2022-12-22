@@ -311,9 +311,13 @@ def main():
                 meals.append(char.get_meal())
             meal_group.add(meals)
 
-            table = BackgroundFurniture("assets/fork.png", (WIDTH//2, HEIGHT//2), 4)
+            table = BackgroundFurniture("assets/table_vertical.png", (WIDTH//2, HEIGHT//2), 4)
+            table2 = BackgroundFurniture("assets/table_vertical.png", (WIDTH//2 + 50, HEIGHT//2), 4)
+            table_group = pygame.sprite.Group()
+            table_group.add(table)
+            table_group.add(table2)
 
-            return meal_group, philosopher_group, table
+            return meal_group, philosopher_group, table_group
         elif number == 5:
             chopstick_0 = Chopstick(225, (WIDTH//2 + 0, HEIGHT//2 - 60))
             chopstick_1 = Chopstick(160, (WIDTH//2 + 55, HEIGHT//2 - 35))
@@ -347,8 +351,10 @@ def main():
             meal_group.add(meals)
 
             table = BackgroundFurniture("assets/table_horizontal.png", (WIDTH//2, HEIGHT//2), 4)
+            table_group = pygame.sprite.Group()
+            table_group.add(table)
 
-            return meal_group, philosopher_group, table
+            return meal_group, philosopher_group, table_group
         elif number == 6:
             pass
         elif number == 7:
@@ -361,7 +367,7 @@ def main():
             pass
         else:
             raise Exception("Number of philosophers must be between 2 and 10")
-    meal_group, philosopher_group, table = load_position(5)
+    meal_group, philosopher_group, table_group = load_position(5)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -373,11 +379,11 @@ def main():
                 if number_lock == False:
                     if addition.rect.collidepoint(event.pos):
                         addition.change_number()
-                        meal_group, philosopher_group, table = load_position(addition.number.get_number())
+                        meal_group, philosopher_group, table_group = load_position(addition.number.get_number())
                     if subtraction.rect.collidepoint(event.pos):
                         subtraction.change_number()
                         logger.debug(f"Trying to load position {subtraction.number.get_number()}")
-                        meal_group, philosopher_group, table = load_position(subtraction.number.get_number())
+                        meal_group, philosopher_group, table_group = load_position(subtraction.number.get_number())
                 if start_game_button.rect.collidepoint(event.pos):
                     start_game_button.start_game()
                     number_lock = True
@@ -392,8 +398,6 @@ def main():
         background_group.draw(screen)
 
         # Eating Table
-        table_group = pygame.sprite.Group()
-        table_group.add(table)
         table_group.draw(screen)
 
         # Game title
