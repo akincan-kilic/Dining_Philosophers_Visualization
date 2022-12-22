@@ -38,7 +38,7 @@ class DiningPhilosophers:
 
 
 def main():
-    n = 5
+    n = 10
     m = 7
     dining_philosophers = DiningPhilosophers(n, m)
     philosophers = [Thread(target=dining_philosophers.philosopher, args=(i,)) for i in range(n)]
