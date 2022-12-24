@@ -69,7 +69,7 @@ class Chair(pygame.sprite.Sprite):
         super().__init__()
         self.image = pygame.image.load(image_file)
         self.image = pygame.transform.scale(self.image, (self.image.get_width()*4, self.image.get_height()*4))
-        self.rect = self.image.get_rect(center=location)
+        self.rect = self.image.get_rect(x=location[0], y=location[1])
 
 
 class Meal(pygame.sprite.Sprite):
@@ -108,7 +108,7 @@ class Character(pygame.sprite.Sprite):
     def __init__(self, character_id, state_id,  location, chopstick_1: Chopstick, chopstick_2: Chopstick):
         super().__init__()
         self.image = pygame.image.load("assets/characters.png")
-        self.rect = self.image.get_rect(center=location)
+        self.rect = self.image.get_rect(x=location[0], y=location[1])
         self.image = self.image.subsurface(pygame.Rect(abs(state_id)*16, character_id*16, 16, 16))
         self.image = pygame.transform.scale(self.image, (self.image.get_width()*4, self.image.get_height()*4))
         if state_id < 0:
@@ -160,9 +160,9 @@ class Text:
 
 
 class Chopstick(pygame.sprite.Sprite):
-    def __init__(self, angle, location=(0, 0)):
+    def __init__(self, angle, location=(0, 0), image_name="assets/chopstick_up.png"):
         super().__init__()
-        self.sprites = {'free':pygame.image.load("assets/chopstick.png"),
+        self.sprites = {'free':pygame.image.load(image_name),
                         'occupied': pygame.image.load("assets/empty.png")}
         self.image = self.sprites['free']
         # self.image = pygame.transform.scale(self.image, (self.image.get_width()*0.3, self.image.get_height()*0.3))
