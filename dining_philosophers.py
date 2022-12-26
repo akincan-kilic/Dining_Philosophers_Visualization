@@ -49,6 +49,7 @@ class BackgroundFurniture(pygame.sprite.Sprite):
         )
         self.rect = self.image.get_rect(center=location)
 
+
 class Fireplace(pygame.sprite.Sprite):
     def __init__(self, location, scale_factor=4.0):
         super().__init__()
@@ -71,6 +72,7 @@ class Fireplace(pygame.sprite.Sprite):
         if self.sprite_counter % 10 == 0:
             self.image = self.sprites[random.randint(0, 3)]
             self.image.get_rect(center=self.rect.center)
+
 
 class TableFurniture(pygame.sprite.Sprite):
     def __init__(self, image_file, location, scale_factor=1.0, horizontal_flip=False, vertical_flip=False):
@@ -100,11 +102,21 @@ class Meal(pygame.sprite.Sprite):
         super().__init__()
         self.sprites = {'full':pygame.image.load("assets/spaghetti_full.png"),
                         'eating':pygame.image.load('assets/meal_eating_yum.png'),
+                        'half_eating': pygame.image.load('assets/meal_one.png'),
                         'empty':pygame.image.load("assets/spaghetti_empty.png")}
         self.image = self.sprites['full']
         self.image = pygame.transform.scale(self.image, (self.image.get_width()*1, self.image.get_height()*1))
         self.rect = self.image.get_rect(center=location)
-        self.left_to_eat = 5
+        self.left_to_eat = 3
+
+    def update_to_half_eating(self):
+        self.image = self.sprites['half_eating']
+
+    def update_to_eating(self):
+        self.image = self.sprites['eating']
+
+    def update_to_full(self):
+        self.image = self.sprites['full']
 
     def take_a_bite(self):
         self.image = self.sprites['eating']
@@ -156,9 +168,12 @@ class Character(pygame.sprite.Sprite):
         time.sleep(random.randint(1, 10))
 
     def eat(self):
+        if self.get_meal().is_finished():
+            return
         if self.chopstick_1.locked():
             return
         self.chopstick_1.acquire()
+        self.get_meal().update_to_half_eating()
         time.sleep(random.random())
         if not self.chopstick_2.locked():
             self.chopstick_2.acquire()
@@ -168,7 +183,9 @@ class Character(pygame.sprite.Sprite):
             self.chopstick_1.release()
             self.chopstick_2.release()
         else:
+            time.sleep(random.random())
             self.chopstick_1.release()
+            self.get_meal().update_to_full()
 
     def get_meal(self):
         return self.meal
@@ -332,7 +349,7 @@ def main():
     HEIGHT = 600
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    # pygame.display.set_caption("Dining Philosophers")
+    pygame.display.set_caption("Dining Philosophers")
     screen.fill((255, 255, 255))
     clock = pygame.time.Clock()
 
@@ -341,7 +358,6 @@ def main():
     background_group_objects = []
     background_group_objects.extend(floors)
     background_group_objects.append(BackgroundFurniture("assets/carpet.png", (WIDTH//2, HEIGHT//2), 12))
-    # background_group_objects.append(BackgroundFurniture("assets/fireplace.png", (WIDTH//2, 60), 4))
     background_group_objects.append(BackgroundFurniture("assets/music_player.png", (720, 90), 4))
     background_group_objects.append(BackgroundFurniture("assets/sofa_front.png", (560, 80), 4))
     background_group_objects.append(BackgroundFurniture("assets/sofa_single_right.png", (740, 200), 4))
@@ -349,7 +365,6 @@ def main():
     background_group_objects.append(BackgroundFurniture("assets/desk.png", (170, 120), 3))
     background_group = pygame.sprite.Group()
     background_group.add(background_group_objects)
-
     fireplace = Fireplace((WIDTH//2, 60), 4)
 
     ### TABLE ###
@@ -366,7 +381,6 @@ def main():
     game_state_group.add(start_game_button)
 
     number_lock = False
-
 
     def create_table(philosopher_number: int) -> list:
         table_group = []
@@ -444,7 +458,6 @@ def main():
 
             chopsticks = [chopstick_0, chopstick_1]
             chairs = [chair_0, chair_1]
-
             philosophers = [philosopher_0, philosopher_1]
             meals = [p.get_meal() for p in philosophers]
 
@@ -467,11 +480,8 @@ def main():
 
             chopsticks = [chopstick_0, chopstick_1, chopstick_2]
             chairs = [chair_0, chair_1, chair_2]
-
-
             philosophers = [philosopher_0, philosopher_1, philosopher_2]
             meals = [p.get_meal() for p in philosophers]
-
 
         elif number == 4:
             chopstick_0 = Chopstick((280,305), image_name='assets/chopstick_45.png')
@@ -496,8 +506,6 @@ def main():
 
             chopsticks = [chopstick_0, chopstick_1, chopstick_2, chopstick_3]
             chairs = [chair_0, chair_1, chair_2, chair_3]
-
-
             philosophers = [philosopher_0, philosopher_1, philosopher_2, philosopher_3]
             meals = [p.get_meal() for p in philosophers]
 
@@ -527,11 +535,8 @@ def main():
             philosopher_3.get_meal()._set_coordinates((285,255))
             philosopher_4.get_meal()._set_coordinates((340,255))
 
-
             chopsticks = [chopstick_0, chopstick_1, chopstick_2, chopstick_3, chopstick_4]
             chairs = [chair_0, chair_1, chair_2, chair_3, chair_4]
-
-
             philosophers = [philosopher_0, philosopher_1, philosopher_2, philosopher_3, philosopher_4]
             meals = [p.get_meal() for p in philosophers]
 
@@ -557,7 +562,6 @@ def main():
             philosopher_4 = Character(3, 4, (350,170), chopstick_4, chopstick_1)
             philosopher_5 = Character(12, 1, (350,320), chopstick_5, chopstick_2)
 
-
             philosopher_0.get_meal()._set_coordinates((250,270))
             philosopher_1.get_meal()._set_coordinates((380,270))
             philosopher_2.get_meal()._set_coordinates((285,290))
@@ -565,11 +569,8 @@ def main():
             philosopher_4.get_meal()._set_coordinates((340,255))
             philosopher_5.get_meal()._set_coordinates((340,290))
 
-
             chopsticks = [chopstick_0, chopstick_1, chopstick_2, chopstick_3, chopstick_4,chopstick_5]
             chairs = [chair_0, chair_1, chair_2, chair_3, chair_4, chair_5]
-
-
             philosophers = [philosopher_0, philosopher_1, philosopher_2, philosopher_3, philosopher_4,philosopher_5]
             meals = [p.get_meal() for p in philosophers]
 
@@ -755,7 +756,6 @@ def main():
 
             chopsticks = [chopstick_0, chopstick_1, chopstick_2, chopstick_3, chopstick_4,chopstick_5, chopstick_6, chopstick_7,chopstick_8,chopstick_9 ]
             chairs = [chair_0, chair_1, chair_2, chair_3, chair_4, chair_5, chair_6, chair_7, chair_8, chair_9]
-
             philosophers = [philosopher_0, philosopher_1, philosopher_2, philosopher_3, philosopher_4,philosopher_5,philosopher_6,philosopher_7, philosopher_8,philosopher_9]
             meals = [p.get_meal() for p in philosophers]
 
